@@ -13,6 +13,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AngularFireAuthModule } from "@angular/fire/auth";
 import { AngularFirestoreModule } from "@angular/fire/firestore"
 import { Camera } from "@ionic-native/camera/ngx";
+import { SocialSharing } from "@ionic-native/social-sharing/ngx"
+
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
@@ -28,6 +30,7 @@ import { Camera } from "@ionic-native/camera/ngx";
     ReactiveFormsModule
   ],
   providers: [
+    SocialSharing,
     Camera,
     StatusBar,
     SplashScreen,

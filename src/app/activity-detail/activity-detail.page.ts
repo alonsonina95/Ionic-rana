@@ -2,10 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ModalController } from '@ionic/angular';
 import { Observable } from 'rxjs';
-import { ActivityVideoPageModule } from '../activity-video/activity-video.module';
 import { ActivityVideoPage } from '../activity-video/activity-video.page';
 import { Activity } from '../interfaces';
 import { ActivityService } from '../services/activity.service';
+import { SocialSharing } from "@ionic-native/social-sharing/ngx";
 
 @Component({
   selector: 'app-activity-detail',
@@ -16,6 +16,7 @@ export class ActivityDetailPage implements OnInit {
 
   activityDetail: Observable<Activity>;
   constructor(
+    private _socialSharing: SocialSharing,
     private modalController: ModalController,
     activityService: ActivityService,
     activatedRoute: ActivatedRoute
@@ -36,6 +37,12 @@ export class ActivityDetailPage implements OnInit {
         videoURL: activity.video_url
       };
       return videoModal.present();
+    });
+  }
+
+  share() {
+    this.activityDetail.subscribe((activity) => {
+      this._socialSharing.share("Look what I found on this app called Rana", activity.name,"",activity.cropped);
     });
   }
 

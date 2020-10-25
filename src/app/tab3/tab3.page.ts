@@ -1,6 +1,9 @@
 import { Component } from '@angular/core';
 import { AlertController } from '@ionic/angular';
 import { CameraOptions, Camera } from "@ionic-native/camera/ngx";
+import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFireAuth } from '@angular/fire/auth';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-tab3',
@@ -10,10 +13,26 @@ import { CameraOptions, Camera } from "@ionic-native/camera/ngx";
 export class Tab3Page {
 
   myProfileImage;
+  myStoredProfileImage: Observable<any>;
+  currentUser;
 
   constructor(
+    private _angularFireStore: AngularFirestore,
+    private _angularFireAuth: AngularFireAuth,
     private _camera: Camera,
-    private _alertController: AlertController) {}
+    private _alertController: AlertController) {
+      this.currentUser = this._angularFireAuth.currentUser;
+      this.currentUser
+        .then((info) => {
+          this.myProfileImage = _angularFireStore
+          .collection("users")
+          .doc(info.uid)
+          .valueChanges()
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
 
   async selectImageSource(){
 
@@ -46,7 +65,20 @@ export class Tab3Page {
           handler: () => {
             this._camera.getPicture(cameraOptions)
               .then((imageData) => {
-                this.myProfileImage = "data:image/jpeg;base64" + imageData;
+                // this.myProfileImage = "data:image/jpeg;base64" + imageData;
+                const image = "data:image/jpeg;base64" + imageData;
+                this.currentUser
+                .then((info) => {
+                  this._angularFireStore
+                  .collection("users")
+                  .doc(info.uid)
+                  .set({
+                    image_src: image
+                  })
+                })
+                .catch((error) => {
+                  console.log(error);
+                })
               })
           }
         },
@@ -64,4 +96,14 @@ export class Tab3Page {
     
     await alert.present();
   }
+
+  // getUserID(currentUser: Promise<any>): any {
+  //   currentUser
+  //     .then((info) => {
+  //       return info.uid;
+  //     })
+  //     .catch((error) => {
+  //       return error;
+  //     });
+  // }
 }
